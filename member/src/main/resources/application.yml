@@ -5,20 +5,20 @@ server:
       timeout: 30m
 
 spring:
-#  application:
-#    name: gulimall-product
+  application:
+    name: gulimall-member
   datasource:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://192.168.111.153:3306/gulimail_ums?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
+      url: jdbc:mysql://192.168.111.154:3306/gulimail_ums?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
       username: root
       password: root
 
 
 
-#  cloud:
-#    nacos:
-#      discovery:
-#        server-addr: localhost:8848
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
 #
 #    sentinel:
 #      transport:
