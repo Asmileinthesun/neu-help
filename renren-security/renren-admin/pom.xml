@@ -22,6 +22,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.alibaba.cloud</groupId>
+			<artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+			<version>2021.0.1.0</version>
+		</dependency>
+		<dependency>
 			<groupId>io.renren</groupId>
 			<artifactId>renren-common</artifactId>
 			<version>5.0.0</version>

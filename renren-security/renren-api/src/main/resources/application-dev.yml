@@ -2,8 +2,8 @@ spring:
   datasource:
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://192.168.111.152:3306/renren_api?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true
-      username: roor
+      url: jdbc:mysql://192.168.111.154:3306/renren_api?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true
+      username: root
       password: root
       initial-size: 10
       max-active: 100
