@@ -6,6 +6,7 @@ import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.common.utils.BinaryUtil;
 import com.aliyun.oss.model.MatchMode;
 import com.aliyun.oss.model.PolicyConditions;
+import com.hzx.common.utils.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +30,7 @@ public class OssController {
     @Value("${spring.cloud.alicloud.access-key}")
     private String accessId;
     @RequestMapping("/oss/policy")
-    public Map<String, String> policy(){
+    public R policy(){
 // 阿里云账号AccessKey拥有所有API的访问权限，风险很高。强烈建议您创建并使用RAM用户进行API访问或日常运维，请登录RAM控制台创建RAM用户。
 
         // 填写Host地址，格式为https://bucketname.endpoint。
@@ -42,8 +43,9 @@ public class OssController {
 
         Map<String, String> respMap=null;
         try {
-            long expireTime = 30;
+            long expireTime = 60;
             long expireEndTime = System.currentTimeMillis() + expireTime * 1000;
+//            long expireEndTime=6000;
             Date expiration = new Date(expireEndTime);
             PolicyConditions policyConds = new PolicyConditions();
             policyConds.addConditionItem(PolicyConditions.COND_CONTENT_LENGTH_RANGE, 0, 1048576000);
@@ -68,6 +70,6 @@ public class OssController {
             // Assert.fail(e.getMessage());
             System.out.println(e.getMessage());
         }
-        return respMap;
+        return R.ok().put("data",respMap) ;
     }
 }
