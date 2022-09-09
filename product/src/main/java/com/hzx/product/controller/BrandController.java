@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import com.hzx.common.valid.AddGroup;
+import com.hzx.common.valid.UpdateStatus;
 import com.hzx.common.valid.updateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -83,7 +84,12 @@ public class BrandController {
 
         return R.ok();
     }
+    @RequestMapping("/update/status")
+    public R updateStatus(@Validated(value = {UpdateStatus.class})@RequestBody BrandEntity brand){
+        brandService.updateById(brand);
 
+        return R.ok();
+    }
     /**
      * 删除
      */

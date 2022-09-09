@@ -7,6 +7,7 @@ import java.io.Serializable;
 
 import com.hzx.common.valid.AddGroup;
 import com.hzx.common.valid.ListValue;
+import com.hzx.common.valid.UpdateStatus;
 import com.hzx.common.valid.updateGroup;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
@@ -50,7 +51,8 @@ public class BrandEntity implements Serializable {
 	/**
 	 * 显示状态[0-不显示；1-显示]
 	 */
-	@ListValue(vals={0,1},groups = {AddGroup.class})
+	@NotNull(groups = {AddGroup.class, UpdateStatus.class})
+	@ListValue(vals={0,1},groups = {AddGroup.class, UpdateStatus.class})
 	private Integer showStatus;
 	/**
 	 * 检索首字母
