@@ -17,6 +17,8 @@
         <module>renren-generator</module>
         <module>common</module>
 	    <module>gateway</module>
+        <module>thiurd-party2</module>
+        <!--	    <module>third-party</module>-->
     </modules>
     <name>gulimarket</name>
     <description>gulimarket</description>
