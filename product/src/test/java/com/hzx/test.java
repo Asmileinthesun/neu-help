@@ -1,26 +1,22 @@
 package com.hzx;
 
-import com.aliyun.oss.*;
 import com.hzx.product.entity.BrandEntity;
 import com.hzx.product.service.BrandService;
-import org.joda.time.DateTime;
+import com.hzx.product.service.CategoryService;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.UUID;
-
+import java.util.Arrays;
+@Slf4j
 @SpringBootTest
 public class test {
     @Autowired
     BrandService brandService;
 
+    @Autowired
+    CategoryService categoryService;
 
     @Test
     public void  tese(){
@@ -29,6 +25,10 @@ public class test {
         brandService.save(brand);
         System.out.println("brand = " + brand);
     }
-
+    @Test
+    public void  tese2(){
+        Long[] path = categoryService.findCatelogPath(225L);
+        log.info("111:{}", Arrays.asList(path));
+    }
 
 }
