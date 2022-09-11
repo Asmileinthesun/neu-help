@@ -1,5 +1,7 @@
 package com.hzx.product.service.impl;
 
+import com.hzx.product.service.CategoryBrandRelationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -14,11 +16,14 @@ import com.hzx.common.utils.Query;
 import com.hzx.product.dao.CategoryDao;
 import com.hzx.product.entity.CategoryEntity;
 import com.hzx.product.service.CategoryService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
 
+    @Autowired
+    CategoryBrandRelationService categoryBrandRelationService;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<CategoryEntity> page = this.page(
@@ -53,6 +58,14 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         List<Long> parentPath = findParentPath(attrGroupId1, list);
         Collections.reverse(parentPath);
         return parentPath.toArray(new Long[0]);
+    }
+
+    @Transactional
+    @Override
+    public void updateDetail(CategoryEntity category) {
+        this.updateById(category);
+        categoryBrandRelationService.updateCategory(category.getCatId(),category.getName());
+
     }
 
     private List<Long>findParentPath(Long attrGroupId1, List<Long> list){

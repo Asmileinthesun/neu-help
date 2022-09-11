@@ -80,7 +80,7 @@ public class BrandController {
      */
     @RequestMapping("/update")
     public R update(@Validated(value = {updateGroup.class})@RequestBody BrandEntity brand){
-		brandService.updateById(brand);
+		brandService.updateDetail(brand);
 
         return R.ok();
     }
