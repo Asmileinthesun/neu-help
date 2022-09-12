@@ -1,5 +1,6 @@
 package com.hzx.product.service.impl;
 
+import com.hzx.product.constant.ProductConstant;
 import com.hzx.product.dao.AttrAttrgroupRelationDao;
 import com.hzx.product.dao.AttrGroupDao;
 import com.hzx.product.dao.CategoryDao;
@@ -51,15 +52,19 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         AttrEntity attrEntity = new AttrEntity();
         BeanUtils.copyProperties(attr,attrEntity);
         this.save(attrEntity);
-        AttrAttrgroupRelationEntity relation = new AttrAttrgroupRelationEntity();
-        relation.setAttrGroupId(attr.getAttrGroupId());
-        relation.setAttrId(attrEntity.getAttrId());
-        attrAttrgroupRelationDao.insert(relation);
+        if (attr.getAttrType()== ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode()){
+            AttrAttrgroupRelationEntity relation = new AttrAttrgroupRelationEntity();
+            relation.setAttrGroupId(attr.getAttrGroupId());
+            relation.setAttrId(attrEntity.getAttrId());
+            attrAttrgroupRelationDao.insert(relation);
+        }
+
     }
 
     @Override
-    public PageUtils queryBaseAttrPage(Map<String, Object> params, Long catelogId) {
-        QueryWrapper<AttrEntity> wrapper = new QueryWrapper<>();
+    public PageUtils queryBaseAttrPage(Map<String, Object> params, Long catelogId, String type) {
+        QueryWrapper<AttrEntity> wrapper = new QueryWrapper<AttrEntity>()
+                .eq("attr_type","base".equalsIgnoreCase(type)?ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode():ProductConstant.AttrEnum.ATTR_TYPE_SALE.getCode());
         if(catelogId!=0){
             wrapper.eq("attr_id",catelogId);
         }
@@ -78,12 +83,17 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         List<AttrRespVo> list = records.stream().map((attrEntity) -> {
             AttrRespVo attrRespVo = new AttrRespVo();
             BeanUtils.copyProperties(attrEntity, attrRespVo);
-            AttrAttrgroupRelationEntity id = attrAttrgroupRelationDao.selectOne(new QueryWrapper<AttrAttrgroupRelationEntity>()
-                    .eq("attr_id", attrEntity.getAttrId()));
-            if (id != null) {
-                String attrGroupName = attrGroupDao.selectById(id.getAttrGroupId()).getAttrGroupName();
-                attrRespVo.setGroupName(attrGroupName);
+
+
+            if("base".equalsIgnoreCase(type)){
+                AttrAttrgroupRelationEntity id = attrAttrgroupRelationDao.selectOne(new QueryWrapper<AttrAttrgroupRelationEntity>()
+                        .eq("attr_id", attrEntity.getAttrId()));
+                if (id != null) {
+                    String attrGroupName = attrGroupDao.selectById(id.getAttrGroupId()).getAttrGroupName();
+                    attrRespVo.setGroupName(attrGroupName);
+                }
             }
+
             CategoryEntity categoryEntity = categoryDao.selectById(attrEntity.getCatelogId());
             if (categoryEntity != null) {
                 attrRespVo.setCatelogName(categoryEntity.getName());
