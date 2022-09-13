@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.hzx.product.entity.AttrEntity;
+import com.hzx.product.service.AttrAttrgroupRelationService;
 import com.hzx.product.service.AttrService;
 import com.hzx.product.service.CategoryService;
 import com.hzx.product.vo.AttrGroupRelationVo;
@@ -36,11 +37,27 @@ public class AttrGroupController {
 
     @Autowired
     private AttrService attrService;
+
+    @Autowired
+    private AttrAttrgroupRelationService attrAttrgroupRelationService;
+//    /product/attrgroup/attr/relation
+    @PostMapping("attr/relation")
+    public R addrelation(@RequestBody List<AttrGroupRelationVo> attrGroupRelationVo){
+        attrAttrgroupRelationService.saveBatch2(attrGroupRelationVo);
+        return R.ok();
+    }
 //    /product/attrgroup/{attrgroupId}/attr/relation
     @GetMapping("/{attrgroupId}/attr/relation")
     public R attrrelation(@PathVariable("attrgroupId")Long attrgroupId){
     List<AttrEntity>list= attrService.getRelationAttr(attrgroupId);
     return R.ok().put("data",list);
+    }
+
+//    /product/attrgroup/{attrgroupId}/noattr/relation
+    @GetMapping("{attrgroupId}/noattr/relation")
+    public R noattrrelation(@PathVariable("attrgroupId")Long attrgroupId,@RequestParam Map<String, Object> params){
+        PageUtils list= attrService.getNoRelationAttr(attrgroupId,params);
+        return R.ok().put("page",list);
     }
     /**
      * 列表
