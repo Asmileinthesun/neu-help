@@ -9,6 +9,7 @@ import com.hzx.product.service.AttrAttrgroupRelationService;
 import com.hzx.product.service.AttrService;
 import com.hzx.product.service.CategoryService;
 import com.hzx.product.vo.AttrGroupRelationVo;
+import com.hzx.product.vo.AttrGroupWithAttrsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +41,14 @@ public class AttrGroupController {
 
     @Autowired
     private AttrAttrgroupRelationService attrAttrgroupRelationService;
+
+//    /product/attrgroup/{catelogId}/withattr
+    @GetMapping("{catelogId}/withattr")
+    public R withattr(@PathVariable("catelogId")Long catelogId){
+
+        List<AttrGroupWithAttrsVo>list= attrGroupService.getAttrGroupWitharrsBycatelogId(catelogId);
+        return R.ok().put("data",list);
+    }
 //    /product/attrgroup/attr/relation
     @PostMapping("attr/relation")
     public R addrelation(@RequestBody List<AttrGroupRelationVo> attrGroupRelationVo){
