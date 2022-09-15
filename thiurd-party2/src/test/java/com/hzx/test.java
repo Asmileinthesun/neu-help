@@ -35,7 +35,7 @@ public class test {
         try {
             InputStream inputStream = Files.newInputStream(Paths.get("E:\\picture\\p\\王冰冰.png"));
             // 创建PutObject请求。
-            ossClient.putObject(bucketName, "王冰冰2.png", inputStream);
+            ossClient.putObject(bucketName, "王冰冰23.png", inputStream);
         } catch (OSSException oe) {
             System.out.println("Caught an OSSException, which means your request made it to OSS, "
                     + "but was rejected with an error response for some reason.");

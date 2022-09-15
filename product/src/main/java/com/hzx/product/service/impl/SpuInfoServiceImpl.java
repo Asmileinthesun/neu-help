@@ -1,5 +1,6 @@
 package com.hzx.product.service.impl;
 
+import com.hzx.product.vo.SpuSaveVo;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -11,6 +12,7 @@ import com.hzx.common.utils.Query;
 import com.hzx.product.dao.SpuInfoDao;
 import com.hzx.product.entity.SpuInfoEntity;
 import com.hzx.product.service.SpuInfoService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service("spuInfoService")
@@ -24,6 +26,12 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         );
 
         return new PageUtils(page);
+    }
+
+    @Transactional
+    @Override
+    public void saveSpuInfo(SpuSaveVo spuInfo) {
+
     }
 
 }

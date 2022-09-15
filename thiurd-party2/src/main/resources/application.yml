@@ -1,8 +1,8 @@
 spring:
   cloud:
     alicloud:
-      access-key: LTAI5t6tzMnWbYEtNadB62Jv
-      secret-key: cJXU3cnrQrwhKfLAHYhcWZekjhVq9e
+      access-key: LTAI5tExfEPUsgnsr8LJdW8M
+      secret-key: YxDxjVOJuVm5dGDt3DRuUMaQEJLtwZ
       oss:
         endpoint: oss-cn-hangzhou.aliyuncs.com
 #        bucket: gulishangcheng-hzx-20220726
