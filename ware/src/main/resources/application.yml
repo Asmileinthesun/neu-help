@@ -5,20 +5,18 @@ server:
       timeout: 30m
 
 spring:
-#  application:
-#    name: gulimall-product
+  application:
+    name: gulimall-ware
   datasource:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://192.168.111.154:3306/gulimail_wms?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
+      url: jdbc:mysql://192.168.111.157:3306/gulimail_wms?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
       username: root
       password: root
 
-
-
-#  cloud:
-#    nacos:
-#      discovery:
-#        server-addr: localhost:8848
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
 #
 #    sentinel:
 #      transport:
@@ -34,8 +32,8 @@ spring:
 #  sentinel:
 #    enabled: true
 #
-#  jackson:
-#    date-format: yyyy-MM-dd HH:mm:ss
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
 #
 #    #关闭thymeleaf缓存
 #  thymeleaf:
@@ -55,9 +53,9 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
 #
-#logging:
-#  level:
-#    com.xunqi.gulimall: error
+logging:
+  level:
+    com.hzx.ware: debug
 
 
 ##暴露所有端点
