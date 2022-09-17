@@ -8,10 +8,12 @@ import com.hzx.product.feign.CouponFeignService;
 import com.hzx.product.service.*;
 import com.hzx.product.vo.*;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -56,13 +58,14 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         return new PageUtils(page);
     }
 
-
+//TODO
     @Transactional
     @Override
     public void saveSpuInfo(SpuSaveVo spuInfo) {
 //1
         SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
         BeanUtils.copyProperties(spuInfo,spuInfoEntity);
+        spuInfoEntity.setCatalogId(spuInfo.getCatelogId());
         spuInfoEntity.setCreateTime(new Date());
         spuInfoEntity.setUpdateTime(new Date());
         this.saveBaseSpuInfo(spuInfoEntity);
@@ -125,7 +128,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                     skuImagesEntity.setImgUrl(images1.getImgUrl());
                     skuImagesEntity.setDefaultImg(images1.getDefaultImg());
                     return skuImagesEntity;
-                }).collect(Collectors.toList());
+                }).filter(skuImagesEntity -> !StringUtils.isEmpty(skuImagesEntity.getImgUrl())).collect(Collectors.toList());
+                //TODO
                 skuImagesService.saveBatch(collect1);
                 //5.3
                 List<Attr> attr = skus1.getAttr();
@@ -140,10 +144,13 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                 SkuReductionTo skuReductionTo = new SkuReductionTo();
                 BeanUtils.copyProperties(skus1,skuReductionTo);
                 skuReductionTo.setSkuId(skuId);
-                R r1 = couponFeignService.saveSkuReduction(skuReductionTo);
-                if (r1.getCode()!=0){
-                    log.error("远程保存sku信息优惠失败");
+                if(skuReductionTo.getFullCount()>0&&skuReductionTo.getFullPrice().compareTo(new BigDecimal("0"))==1){
+                    R r1 = couponFeignService.saveSkuReduction(skuReductionTo);
+                    if (r1.getCode()!=0){
+                        log.error("远程保存sku信息优惠失败");
+                    }
                 }
+
             });
         }
 
