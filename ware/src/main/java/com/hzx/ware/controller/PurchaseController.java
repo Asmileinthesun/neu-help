@@ -1,8 +1,11 @@
 package com.hzx.ware.controller;
 
 import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
+import com.hzx.ware.vo.MergeVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +28,18 @@ import com.hzx.common.utils.R;
 public class PurchaseController {
     @Autowired
     private PurchaseService purchaseService;
-
+//    /ware/purchase/received
+    @PostMapping("/received")
+    public R received(@RequestBody List<Long> ids){
+        purchaseService.received(ids);
+        return R.ok();
+    }
+///ware/purchase/merge
+    @PostMapping("/merge")
+    public R Merge(@RequestBody MergeVo mergeVo){
+         purchaseService.mergepurchase(mergeVo);
+        return R.ok();
+    }
 //    /ware/purchase/unreceive/list
 @GetMapping("unreceive/list")
 public R unreceivelist(@RequestParam Map<String, Object> params){
@@ -59,6 +73,8 @@ public R unreceivelist(@RequestParam Map<String, Object> params){
      */
     @RequestMapping("/save")
     public R save(@RequestBody PurchaseEntity purchase){
+        purchase.setCreateTime(new Date());
+        purchase.setUpdateTime(new Date());
 		purchaseService.save(purchase);
 
         return R.ok();

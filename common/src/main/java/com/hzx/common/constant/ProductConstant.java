@@ -1,4 +1,4 @@
-package com.hzx.product.constant;
+package com.hzx.common.constant;
 
 public class ProductConstant {
     public enum AttrEnum{

@@ -1,6 +1,7 @@
 package com.hzx.product.service.impl;
 
-import com.hzx.product.constant.ProductConstant;
+//import com.hzx.product.constant.ProductConstant;
+import com.hzx.common.constant.ProductConstant;
 import com.hzx.product.dao.AttrAttrgroupRelationDao;
 import com.hzx.product.dao.AttrGroupDao;
 import com.hzx.product.dao.CategoryDao;
