@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.hzx.ware.vo.MergeVo;
+import com.hzx.ware.vo.PurchaseFinishVo;
+import com.hzx.ware.vo.PurchaseItemDoneVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +30,13 @@ import com.hzx.common.utils.R;
 public class PurchaseController {
     @Autowired
     private PurchaseService purchaseService;
+
+//    /ware/purchase/done
+    @PostMapping("/done")
+    public R finish(@RequestBody PurchaseFinishVo purchaseItemDoneVo){
+        purchaseService.done(purchaseItemDoneVo);
+        return R.ok();
+    }
 //    /ware/purchase/received
     @PostMapping("/received")
     public R received(@RequestBody List<Long> ids){

@@ -3,10 +3,14 @@ package com.hzx.ware.service.impl;
 import com.hzx.common.constant.WareConstant;
 import com.hzx.ware.entity.PurchaseDetailEntity;
 import com.hzx.ware.service.PurchaseDetailService;
+import com.hzx.ware.service.WareSkuService;
 import com.hzx.ware.vo.MergeVo;
+import com.hzx.ware.vo.PurchaseFinishVo;
+import com.hzx.ware.vo.PurchaseItemDoneVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +33,8 @@ public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity
 
     @Autowired
     PurchaseDetailService purchaseDetailService;
+    @Autowired
+    WareSkuService wareSkuService;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<PurchaseEntity> page = this.page(
@@ -110,6 +116,38 @@ public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity
             purchaseDetailService.updateBatchById(collect1);
 
         });
+    }
+
+    @Override
+    public void done(PurchaseFinishVo purchaseItemDoneVo) {
+        //1
+        Long id = purchaseItemDoneVo.getId();
+        //2
+        Boolean flag=true;
+        List<PurchaseItemDoneVo> items = purchaseItemDoneVo.getItems();
+        List<PurchaseDetailEntity> updates= new ArrayList<>();
+        for (PurchaseItemDoneVo item : items) {
+            PurchaseDetailEntity purchaseDetailEntity = new PurchaseDetailEntity();
+            if (item.getStatus()==WareConstant.PurchaseDetailStatusEnum.HASERROR.getCode()){
+                flag=false;
+                purchaseDetailEntity.setStatus(item.getStatus());
+            }else {
+                purchaseDetailEntity.setStatus(WareConstant.PurchaseDetailStatusEnum.FINISH.getCode());
+                //3
+                PurchaseDetailEntity byId = purchaseDetailService.getById(item.getItemId());
+                wareSkuService.addStock(byId.getSkuId(),byId.getWareId(),byId.getSkuNum());
+            }
+            purchaseDetailEntity.setId(item.getItemId());
+            updates.add(purchaseDetailEntity);
+        }
+        purchaseDetailService.updateBatchById(updates);
+        PurchaseEntity purchase = new PurchaseEntity();
+        purchase.setId(id);
+        purchase.setStatus(flag?WareConstant.PurchaseStatusEnum.FINISH.getCode() : WareConstant.PurchaseStatusEnum.HASERROR.getCode());
+        purchase.setUpdateTime(new Date());
+        this.updateById(purchase);
+
+
     }
 
 }
