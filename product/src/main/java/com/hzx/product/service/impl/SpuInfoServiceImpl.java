@@ -2,9 +2,11 @@ package com.hzx.product.service.impl;
 
 import com.hzx.common.to.SkuReductionTo;
 import com.hzx.common.to.SpuBoundsTo;
+import com.hzx.common.to.es.SkuEsModel;
 import com.hzx.common.utils.R;
 import com.hzx.product.entity.*;
 import com.hzx.product.feign.CouponFeignService;
+import com.hzx.product.feign.WareFeignService;
 import com.hzx.product.service.*;
 import com.hzx.product.vo.*;
 import lombok.experimental.Accessors;
@@ -14,9 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -48,6 +48,12 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     SkuSaleAttrValueService skuSaleAttrValueService;
     @Autowired
     CouponFeignService couponFeignService;
+    @Autowired
+    BrandService brandService;
+    @Autowired
+    CategoryService categoryService;
+    @Autowired
+    WareFeignService wareFeignService;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<SpuInfoEntity> page = this.page(
@@ -197,6 +203,50 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
         return new PageUtils(page);
 
+    }
+
+    @Override
+    public void up(Long spuId) {
+        //1
+       List<SkuInfoEntity>skuInfoEntities= skuInfoService.getSkusBySpuId(spuId);
+        List<Long> collect3 = skuInfoEntities.stream().map(SkuInfoEntity::getSkuId).collect(Collectors.toList());
+        //
+        List<ProductAttrValueEntity> attrlistforspu = productAttrValueService.baseAttrlistforspu(spuId);
+        List<Long> collect1 = attrlistforspu.stream().map(attr -> attr.getAttrId()).collect(Collectors.toList());
+       List<Long>list= attrService.selecrSearchAttrs(collect1);
+       Set<Long> set=new HashSet<>(list);
+
+        List<SkuEsModel.Attrs> collect2 = attrlistforspu.stream()
+                .filter(item -> set.contains(item.getAttrId()))
+                .map(item -> {
+                    SkuEsModel.Attrs attrs1 = new SkuEsModel.Attrs();
+                    BeanUtils.copyProperties(item, attrs1);
+                    return attrs1;
+                }).collect(Collectors.toList());
+        //
+        R r = wareFeignService.getSkushasStock(collect3);
+        Map<String, Object> map = (Map<String, Object>) r.get("data");
+        
+
+        //2
+        List<SkuEsModel> collect = skuInfoEntities.stream().map(skuInfoEntity -> {
+            SkuEsModel skuEsModel = new SkuEsModel();
+            BeanUtils.copyProperties(skuInfoEntity,skuEsModel);
+            skuEsModel.setSkuPrice(skuInfoEntity.getPrice());
+            skuEsModel.setSkuImg(skuInfoEntity.getSkuDefaultImg());
+            //TODO
+            skuEsModel.setHasStock(false);
+            skuEsModel.setHotScore(0L);
+            BrandEntity brand = brandService.getById(skuEsModel.getBrandId());
+            skuEsModel.setBrandName(brand.getName());
+            skuEsModel.setBrandImg(brand.getLogo());
+            CategoryEntity category = categoryService.getById(skuEsModel.getCatalogId());
+            skuEsModel.setCatalogName(category.getName());
+            //
+            skuEsModel.setAttrs(collect2);
+            return skuEsModel;
+        }).collect(Collectors.toList());
+        //TODO
     }
 
 

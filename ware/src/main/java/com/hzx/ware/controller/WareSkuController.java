@@ -1,14 +1,12 @@
 package com.hzx.ware.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import com.hzx.ware.vo.SkuHasStockVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.hzx.ware.entity.WareSkuEntity;
 import com.hzx.ware.service.WareSkuService;
@@ -29,7 +27,11 @@ import com.hzx.common.utils.R;
 public class WareSkuController {
     @Autowired
     private WareSkuService wareSkuService;
-
+@PostMapping("/hasstock")
+    public R getSkushasStock(@RequestBody List<Long> skuids){
+       List<SkuHasStockVo>vo= wareSkuService.getSkuHasStock(skuids);
+        return R.ok().put("data",vo);
+    }
     /**
      * 列表
      */
