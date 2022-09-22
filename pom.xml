@@ -18,7 +18,8 @@
         <module>common</module>
 	    <module>gateway</module>
         <module>thiurd-party2</module>
-        <!--	    <module>third-party</module>-->
+	    <module>guli-search</module>
+	    <!--	    <module>third-party</module>-->
     </modules>
     <name>gulimarket</name>
     <description>gulimarket</description>
