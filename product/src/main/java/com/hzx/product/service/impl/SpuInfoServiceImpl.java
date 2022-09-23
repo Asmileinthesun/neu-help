@@ -1,11 +1,13 @@
 package com.hzx.product.service.impl;
 
+import com.hzx.common.constant.ProductConstant;
 import com.hzx.common.to.SkuReductionTo;
 import com.hzx.common.to.SpuBoundsTo;
 import com.hzx.common.to.es.SkuEsModel;
 import com.hzx.common.utils.R;
 import com.hzx.product.entity.*;
 import com.hzx.product.feign.CouponFeignService;
+import com.hzx.product.feign.SearchFeign;
 import com.hzx.product.feign.WareFeignService;
 import com.hzx.product.service.*;
 import com.hzx.product.vo.*;
@@ -54,6 +56,9 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     CategoryService categoryService;
     @Autowired
     WareFeignService wareFeignService;
+
+    @Autowired
+    SearchFeign searchFeign;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<SpuInfoEntity> page = this.page(
@@ -224,18 +229,25 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                     return attrs1;
                 }).collect(Collectors.toList());
         //
-        R r = wareFeignService.getSkushasStock(collect3);
-        Map<String, Object> map = (Map<String, Object>) r.get("data");
-        
-
+        Map<String, Object> map=null;
+        try {
+            R r = wareFeignService.getSkushasStock(collect3);
+             map = (Map<String, Object>) r.get("data");
+            System.err.println("map = " + map);
+        }catch (Exception e){}
         //2
+        Map<String, Object> finalMap = map;
         List<SkuEsModel> collect = skuInfoEntities.stream().map(skuInfoEntity -> {
             SkuEsModel skuEsModel = new SkuEsModel();
             BeanUtils.copyProperties(skuInfoEntity,skuEsModel);
             skuEsModel.setSkuPrice(skuInfoEntity.getPrice());
             skuEsModel.setSkuImg(skuInfoEntity.getSkuDefaultImg());
             //TODO
-            skuEsModel.setHasStock(false);
+            if (finalMap ==null){
+                skuEsModel.setHasStock(true);
+            }else {
+                skuEsModel.setHasStock((Boolean) finalMap.get("hasStock"));
+            }
             skuEsModel.setHotScore(0L);
             BrandEntity brand = brandService.getById(skuEsModel.getBrandId());
             skuEsModel.setBrandName(brand.getName());
@@ -247,6 +259,14 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             return skuEsModel;
         }).collect(Collectors.toList());
         //TODO
+        R r = searchFeign.productStatusUp(collect);
+        if (r.getCode()==0){
+            //TODO
+            this.baseMapper.updateSpuStatus(spuId, ProductConstant.StatusEnum.SPU_UP.getCode());
+        }else {
+            //TODO
+        }
+
     }
 
 
