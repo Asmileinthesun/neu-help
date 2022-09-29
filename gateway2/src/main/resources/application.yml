@@ -41,6 +41,11 @@ spring:
               - Path=/api/**
           filters:
             - RewritePath=/api/(?<segment>/?.*), /renren-admin/$\{segment}
+
+        - id: gulimail_host_route
+          uri: lb://gulimall-product
+          predicates:
+            - Host=**.gulimail.com
 #
 #        - id: qq_route
 #          uri: https://www.qq.com
