@@ -8,9 +8,11 @@ import com.hzx.product.vo.Catelog2Vo;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -89,50 +91,86 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         String catalogJson = stringRedisTemplate.opsForValue().get("catalogJson");
         if (StringUtils.isEmpty(catalogJson)){
             Map<String, List<Catelog2Vo>> catalogJsonFromDb = getCatalogJsonFromDb();
-            String s = JSON.toJSONString(catalogJsonFromDb);
-            stringRedisTemplate.opsForValue().set("catalogJson",s);
+            return  catalogJsonFromDb;
         }
         return JSON.parseObject(catalogJson, new TypeReference<Map<String, List<Catelog2Vo>>>() {
 });
     }
 
     public Map<String, List<Catelog2Vo>> getCatalogJsonFromDb() {
-
 //        Map<String, List<Catelog2Vo>> json = (Map<String, List<Catelog2Vo>>) cache.get("catalogJson");
 //        if (cache.get("catalogJson")==null){
 //            cache.put("catalogJson",parent_cid);
 //        }
 //        return json;
-            /**
-             * 优化
-             */
-            List<CategoryEntity> categoryEntities2 = baseMapper.selectList(null);
+        String s = UUID.randomUUID().toString();
+        //分布式锁
+        Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent("lock", s,300, TimeUnit.SECONDS);
+        if (lock){
+//            stringRedisTemplate.expire("lock",30, TimeUnit.SECONDS);
+            Map<String, List<Catelog2Vo>> dataFromDb;
+            try {
+                 dataFromDb = getDataFromDb();
+            }finally {
+                String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
+                stringRedisTemplate.execute(new DefaultRedisScript<Long>(script, Long.class),Arrays.asList("lock"),s);
+            }
 
-            List<CategoryEntity>categoryEntities=getParent_cid(categoryEntities2, 0L);
-            Map<String, List<Catelog2Vo>> parent_cid = categoryEntities.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), v -> {
-                        List<CategoryEntity> selectList = getParent_cid(categoryEntities2, v.getCatId());
-                        List<Catelog2Vo> collect = null;
-                        if (selectList != null) {
-                            collect = selectList.stream().map(item -> {
-                                Catelog2Vo catelog2Vo = new Catelog2Vo(v.getCatId().toString(), null, item.getCatId().toString(), item.getName());
-                                List<CategoryEntity> categoryEntities1 = getParent_cid(categoryEntities2, item.getCatId());
-                                if (categoryEntities1 != null) {
-                                    List<Catelog2Vo.Catelog3Vo> collect1 = categoryEntities1.stream().map(l3 -> {
-                                        Catelog2Vo.Catelog3Vo catelog3Vo = new Catelog2Vo.Catelog3Vo(item.getCatId().toString(), l3.getCatId().toString(), l3.getName());
-                                        return catelog3Vo;
-                                    }).collect(Collectors.toList());
-                                    catelog2Vo.setCatalog3List(collect1);
+//            String lock1 = stringRedisTemplate.opsForValue().get("lock");
+//            if (s.equals(lock1)) {
+//                stringRedisTemplate.delete("lock");
+//            }
+            //lua
 
-                                }
-                                return catelog2Vo;
-                            }).collect(Collectors.toList());
-                        }
-                        return collect;
+            return dataFromDb;
+        }else {
+            //失败重试
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            return  getCatalogJsonFromDb();//自旋的方式
+        }
+    }
+
+    private Map<String, List<Catelog2Vo>> getDataFromDb() {
+        String catalogJson = stringRedisTemplate.opsForValue().get("catalogJson");
+        if(!StringUtils.isEmpty(catalogJson)){
+            return JSON.parseObject(catalogJson, new TypeReference<Map<String, List<Catelog2Vo>>>() {
+            });
+        }
+
+        /**
+         * 优化
+         */
+        List<CategoryEntity> categoryEntities2 = baseMapper.selectList(null);
+
+        List<CategoryEntity>categoryEntities=getParent_cid(categoryEntities2, 0L);
+        Map<String, List<Catelog2Vo>> parent_cid = categoryEntities.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), v -> {
+                    List<CategoryEntity> selectList = getParent_cid(categoryEntities2, v.getCatId());
+                    List<Catelog2Vo> collect = null;
+                    if (selectList != null) {
+                        collect = selectList.stream().map(item -> {
+                            Catelog2Vo catelog2Vo = new Catelog2Vo(v.getCatId().toString(), null, item.getCatId().toString(), item.getName());
+                            List<CategoryEntity> categoryEntities1 = getParent_cid(categoryEntities2, item.getCatId());
+                            if (categoryEntities1 != null) {
+                                List<Catelog2Vo.Catelog3Vo> collect1 = categoryEntities1.stream().map(l3 -> {
+                                    Catelog2Vo.Catelog3Vo catelog3Vo = new Catelog2Vo.Catelog3Vo(item.getCatId().toString(), l3.getCatId().toString(), l3.getName());
+                                    return catelog3Vo;
+                                }).collect(Collectors.toList());
+                                catelog2Vo.setCatalog3List(collect1);
+
+                            }
+                            return catelog2Vo;
+                        }).collect(Collectors.toList());
                     }
-            ));
-
-            return parent_cid;
-
+                    return collect;
+                }
+        ));
+        String s = JSON.toJSONString(parent_cid);
+        stringRedisTemplate.opsForValue().set("catalogJson",s);
+        return parent_cid;
     }
 
     private List<CategoryEntity> getParent_cid(List<CategoryEntity> categoryEntities2,Long parent_cid) {
