@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 public class SearchRes {
-    private List<SkuEsModel> peoducts;
+    private List<SkuEsModel> products;
     /**
      * 分页信息
      */
@@ -19,20 +19,19 @@ public class SearchRes {
     private List<AttrVo> attrVos;
 
     @Data
-    private static class BrandVo{
+    public static class BrandVo{
         private Long brandId;
         private String brandName;
         private String brandImg;
     }
     @Data
-    private static class CatalogVo{
-        private Long brandId;
-        private String brandName;
-        private String brandImg;
+    public static class CatalogVo{
+        private Long catalogId;
+        private String catalogName;
     }
 
     @Data
-    private static class AttrVo{
+    public static class AttrVo{
         private Long attrId;
         private String attrName;
         private List<String> attrValue;

@@ -19,6 +19,7 @@ public class SearchController {
 
       SearchRes result=  mallSearchService.search(searchParam);
       model.addAttribute("result",result);
+        System.err.println("result = " + result);
         return "list";
     }
 }
