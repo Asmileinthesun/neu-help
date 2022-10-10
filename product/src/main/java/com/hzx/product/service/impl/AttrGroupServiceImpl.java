@@ -3,6 +3,7 @@ package com.hzx.product.service.impl;
 import com.hzx.product.entity.AttrEntity;
 import com.hzx.product.service.AttrService;
 import com.hzx.product.vo.AttrGroupWithAttrsVo;
+import com.hzx.product.vo.SkuItemVo;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,5 +70,11 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         }).collect(Collectors.toList());
 
         return collect;
+    }
+
+    @Override
+    public List<SkuItemVo.SpuItemBaseAttrVo> getAttrWithattrsByspuId(Long spuId, Long catalogId) {
+
+        return this.baseMapper.getAttrWithattrsByspuId(spuId,catalogId);
     }
 }

@@ -12,6 +12,9 @@
         <result property="attrValue" column="attr_value"/>
         <result property="attrSort" column="attr_sort"/>
     </resultMap>
+	<select id="getSaleAttrsBySpuId" resultType="com.hzx.product.vo.SkuItemVo.SkuItemSaleAttrVo">
+	
+	</select>
 
 
 </mapper>
