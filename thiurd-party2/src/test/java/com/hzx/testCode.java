@@ -3,8 +3,12 @@ package com.hzx;
 import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.OSSException;
-//import org.junit.Test;
-//import org.junit.jupiter.api.Test;
+import com.aliyuncs.CommonRequest;
+import com.aliyuncs.CommonResponse;
+import com.aliyuncs.DefaultAcsClient;
+import com.aliyuncs.IAcsClient;
+import com.aliyuncs.http.MethodType;
+import com.aliyuncs.profile.DefaultProfile;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,15 +17,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
+//import com.aliyuncs.dysmsazpi.model.v20170525.*;
 @SpringBootTest
-public class test {
-
-
+public class testCode {
     @Autowired(required = false)
     OSSClient ossClient;
-
-
     @Test
     public void uploadFileAvatar() {
         // Endpoint以华东1（杭州）为例，其它Region请按实际情况填写。
@@ -56,4 +56,6 @@ public class test {
             }
         }
     }
+
+
 }
