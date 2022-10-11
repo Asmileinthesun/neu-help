@@ -1,6 +1,10 @@
 package com.hzx.controller;
 
+import com.alibaba.fastjson.TypeReference;
+import com.hzx.common.utils.R;
+import com.hzx.feign.MemberfeiginService;
 import com.hzx.vo.UserRegister;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.bind.BindResult;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +22,8 @@ import java.util.stream.Collectors;
 
 @Controller
 public class indexController {
+    @Autowired
+    MemberfeiginService memberfeiginService;
     @PostMapping("/regist")
     public String regist(@Valid UserRegister userRegister, BindingResult result,
                          RedirectAttributes redirectAttributes) {
@@ -28,6 +34,23 @@ public class indexController {
             return "redirect:http://auth.gulimall.com/reg.html";
 
         }
-        return "redirect:/login.html";
+        String code = userRegister.getCode();
+        if (code.equals("1234")){
+            R regist = memberfeiginService.regist(userRegister);
+            if (regist.getCode() == 0) {
+                return "redirect:/login.html";
+            }else {
+                Map<String, String> collect = new HashMap<>();
+                collect.put("msg",regist.getData(new TypeReference<String>(){}));
+                redirectAttributes.addFlashAttribute("errors",collect);
+                return "redirect:http://auth.gulimall.com/reg.html";
+            }
+        }else {
+            Map<String, String> collect = new HashMap<>();
+            collect.put("code","验证码错误");
+            redirectAttributes.addFlashAttribute("errors",collect);
+            return "redirect:http://auth.gulimall.com/reg.html";
+        }
+//        return "redirect:/login.html";
     }
 }

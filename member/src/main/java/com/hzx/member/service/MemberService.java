@@ -3,6 +3,7 @@ package com.hzx.member.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hzx.common.utils.PageUtils;
 import com.hzx.member.entity.MemberEntity;
+import com.hzx.member.vo.UserRegistVo;
 
 import java.util.Map;
 
@@ -16,5 +17,9 @@ import java.util.Map;
 public interface MemberService extends IService<MemberEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    void regist(UserRegistVo userRegistVo);
+    void checkPhoneUnique(String phone);
+    void checkUserNameUnique(String userName);
 }
 

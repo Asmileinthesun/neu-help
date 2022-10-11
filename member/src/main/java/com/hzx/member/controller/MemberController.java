@@ -3,7 +3,11 @@ package com.hzx.member.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.hzx.common.exception.BizCodeEnume;
+import com.hzx.member.exception.PhoneException;
+import com.hzx.member.exception.UsernameException;
 import com.hzx.member.feign.CouponFeign;
+import com.hzx.member.vo.UserRegistVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +32,18 @@ public class MemberController {
     private MemberService memberService;
     @Autowired
     CouponFeign couponFeign;
+    @PostMapping("/regist")
+    public R regist(@RequestBody UserRegistVo userRegistVo){
+        try {
+            memberService.regist(userRegistVo);
+        }catch (PhoneException e){
+            return R.error(BizCodeEnume.PHONE_EXIST_EXCEPTION.getCode(),BizCodeEnume.PHONE_EXIST_EXCEPTION.getMsg());
+        }catch (UsernameException e){
+            return R.error(BizCodeEnume.USER_EXIST_EXCEPTION.getCode(),BizCodeEnume.USER_EXIST_EXCEPTION.getMsg());
+        }
+
+        return R.ok();
+    }
     @RequestMapping("test")
     public R test(){
         MemberEntity memberEntity = new MemberEntity();
