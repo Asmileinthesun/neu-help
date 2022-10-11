@@ -1,6 +1,7 @@
 package com.hzx;
 
 import com.hzx.product.dao.AttrGroupDao;
+import com.hzx.product.dao.SkuSaleAttrValueDao;
 import com.hzx.product.entity.BrandEntity;
 import com.hzx.product.service.BrandService;
 import com.hzx.product.service.CategoryService;
@@ -54,6 +55,13 @@ public class test {
     public void  tese2(){
         Long[] path = categoryService.findCatelogPath(225L);
         log.info("111:{}", Arrays.asList(path));
+    }
+    @Autowired
+    SkuSaleAttrValueDao skuSaleAttrValueDao;
+    @Test
+    public void  tese12(){
+        List<SkuItemVo.SkuItemSaleAttrVo> saleAttrsBySpuId = skuSaleAttrValueDao.getSaleAttrsBySpuId(3L);
+        System.out.println("saleAttrsBySpuId = " + saleAttrsBySpuId);
     }
     @Test
     public void  tese21w(){

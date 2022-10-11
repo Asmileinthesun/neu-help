@@ -19,6 +19,7 @@
 	    <module>gateway</module>
         <module>thiurd-party2</module>
 	    <module>guli-search</module>
+	    <module>auth-server</module>
 	    <!--	    <module>third-party</module>-->
     </modules>
     <name>gulimarket</name>

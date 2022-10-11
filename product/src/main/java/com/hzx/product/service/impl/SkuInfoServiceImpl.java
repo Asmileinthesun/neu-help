@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadPoolExecutor;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -31,6 +34,8 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
     SpuInfoDescService spuInfoDescService;
     @Autowired
     SkuSaleAttrValueService skuSaleAttrValueService;
+    @Autowired
+    ThreadPoolExecutor executor;
     @Autowired
     AttrGroupService attrGroupService;
     @Override
@@ -109,26 +114,31 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
 
     @Override
     public SkuItemVo item(Long skuId) {
+
         SkuItemVo skuItemVo = new SkuItemVo();
-        SkuInfoEntity infoEntity = getById(skuId);
-        Long catalogId = infoEntity.getCatalogId();
-        Long spuId = infoEntity.getSpuId();
-        skuItemVo.setSkuInfoEntity(infoEntity);
-
-        //
-        List<SkuImagesEntity>images= skuImagesService.getImagesBySkuId(skuId);
-        skuItemVo.setImages(images);
-        //
-      List<SkuItemVo.SkuItemSaleAttrVo>saleAttrVos=  skuSaleAttrValueService.getSaleAttrsBySpuId(spuId);
-      skuItemVo.setSaleAttrVos(saleAttrVos);
-        //
-
-        SpuInfoDescEntity spuinfo = spuInfoDescService.getById(spuId);
-        skuItemVo.setDesp(spuinfo);
-        //
-        List<SkuItemVo.SpuItemBaseAttrVo>groupattrs=attrGroupService.getAttrWithattrsByspuId(spuId,catalogId);
-        skuItemVo.setGroupattrs(groupattrs);
-return null;
+        CompletableFuture<SkuInfoEntity> infoFuture = CompletableFuture.supplyAsync(() -> {
+            SkuInfoEntity infoEntity = getById(skuId);
+            skuItemVo.setSkuInfoEntity(infoEntity);
+            return infoEntity;
+        }, executor);
+        CompletableFuture<Void> saleAttr = infoFuture.thenAcceptAsync((res) -> {
+            List<SkuItemVo.SkuItemSaleAttrVo> saleAttrVos = skuSaleAttrValueService.getSaleAttrsBySpuId(res.getSpuId());
+            skuItemVo.setSaleAttrVos(saleAttrVos);
+        }, executor);
+        CompletableFuture<Void> DescFu = infoFuture.thenAcceptAsync(res -> {
+            SpuInfoDescEntity spuinfo = spuInfoDescService.getById(res.getSpuId());
+            skuItemVo.setDesp(spuinfo);
+        }, executor);
+        CompletableFuture<Void> BaseFu = infoFuture.thenAcceptAsync(res -> {
+            List<SkuItemVo.SpuItemBaseAttrVo> groupattrs = attrGroupService.getAttrWithattrsByspuId(res.getSpuId(), res.getCatalogId());
+            skuItemVo.setGroupattrs(groupattrs);
+        }, executor);
+        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+            List<SkuImagesEntity> images = skuImagesService.getImagesBySkuId(skuId);
+            skuItemVo.setImages(images);
+        }, executor);
+        CompletableFuture.allOf(infoFuture,saleAttr,DescFu,BaseFu,future).join();
+        return skuItemVo;
     }
 
 }
