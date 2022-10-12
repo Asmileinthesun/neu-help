@@ -55,11 +55,14 @@ public class indexController {
 //        return "redirect:/login.html";
     }
     @PostMapping("/login")
-    public String login(UserLoginVo userLoginVo){
+    public String login(UserLoginVo userLoginVo,RedirectAttributes redirectAttributes){
         R login = memberfeiginService.login(userLoginVo);
         if (login.getCode()==0){
             return "redirect:http://gulimall.com";
         }else {
+            Map<String,String>errors=new HashMap<>();
+            errors.put("msg",login.getData("msg",new TypeReference<String>(){}));
+            redirectAttributes.addFlashAttribute("errors",errors);
             return "redirect:http://auth.gulimall.com/login.html";
         }
 

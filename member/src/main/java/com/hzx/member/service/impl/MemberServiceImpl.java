@@ -101,7 +101,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
             BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
             boolean matches = bCryptPasswordEncoder.matches(password, password1);
             if (matches)return memberEntity;
-            else return null;
+
         }
+        return null;
     }
 }

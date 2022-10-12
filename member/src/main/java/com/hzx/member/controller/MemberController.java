@@ -50,7 +50,7 @@ public class MemberController {
     @PostMapping("/login")
     public R login(@RequestBody MemberLoginVo memberLoginVo){
         MemberEntity memberEntity= memberService.login(memberLoginVo);
-        if (memberEntity == null) {
+        if (memberEntity != null) {
             return R.ok();
         }else {
             return R.error(BizCodeEnume.LOGINACCT_PASSWORD_EXCEPTION.getCode(), BizCodeEnume.LOGINACCT_PASSWORD_EXCEPTION.getMsg());
