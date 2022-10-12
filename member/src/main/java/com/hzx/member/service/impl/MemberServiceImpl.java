@@ -4,6 +4,7 @@ import com.hzx.member.dao.MemberLevelDao;
 import com.hzx.member.entity.MemberLevelEntity;
 import com.hzx.member.exception.PhoneException;
 import com.hzx.member.exception.UsernameException;
+import com.hzx.member.vo.MemberLoginVo;
 import com.hzx.member.vo.UserRegistVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -61,6 +62,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         memberEntity.setMobile(userRegistVo.getPhone());
         memberEntity.setGender(0);
         memberEntity.setCreateTime(new Date());
+        System.err.println("true =创建成功 " + true);
        this.baseMapper.insert(memberEntity);
     }
 
@@ -86,4 +88,20 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         }
     }
 
+    @Override
+    public MemberEntity login(MemberLoginVo memberLoginVo) {
+        String loginacct = memberLoginVo.getLoginacct();
+        String password = memberLoginVo.getPassword();
+        MemberEntity memberEntity = this.baseMapper.selectOne(new QueryWrapper<MemberEntity>().eq("username", loginacct)
+                .or().eq("mobile", loginacct));
+        if (memberEntity == null) {
+            return null;
+        }else {
+            String password1 = memberEntity.getPassword();
+            BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+            boolean matches = bCryptPasswordEncoder.matches(password, password1);
+            if (matches)return memberEntity;
+            else return null;
+        }
+    }
 }

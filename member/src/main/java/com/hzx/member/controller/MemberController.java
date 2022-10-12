@@ -7,6 +7,7 @@ import com.hzx.common.exception.BizCodeEnume;
 import com.hzx.member.exception.PhoneException;
 import com.hzx.member.exception.UsernameException;
 import com.hzx.member.feign.CouponFeign;
+import com.hzx.member.vo.MemberLoginVo;
 import com.hzx.member.vo.UserRegistVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +36,7 @@ public class MemberController {
     @PostMapping("/regist")
     public R regist(@RequestBody UserRegistVo userRegistVo){
         try {
+            System.out.println("userRegistVo = " + userRegistVo);
             memberService.regist(userRegistVo);
         }catch (PhoneException e){
             return R.error(BizCodeEnume.PHONE_EXIST_EXCEPTION.getCode(),BizCodeEnume.PHONE_EXIST_EXCEPTION.getMsg());
@@ -43,6 +45,17 @@ public class MemberController {
         }
 
         return R.ok();
+    }
+
+    @PostMapping("/login")
+    public R login(@RequestBody MemberLoginVo memberLoginVo){
+        MemberEntity memberEntity= memberService.login(memberLoginVo);
+        if (memberEntity == null) {
+            return R.ok();
+        }else {
+            return R.error(BizCodeEnume.LOGINACCT_PASSWORD_EXCEPTION.getCode(), BizCodeEnume.LOGINACCT_PASSWORD_EXCEPTION.getMsg());
+        }
+
     }
     @RequestMapping("test")
     public R test(){

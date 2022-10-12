@@ -3,6 +3,7 @@ package com.hzx.controller;
 import com.alibaba.fastjson.TypeReference;
 import com.hzx.common.utils.R;
 import com.hzx.feign.MemberfeiginService;
+import com.hzx.vo.UserLoginVo;
 import com.hzx.vo.UserRegister;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.bind.BindResult;
@@ -38,10 +39,10 @@ public class indexController {
         if (code.equals("1234")){
             R regist = memberfeiginService.regist(userRegister);
             if (regist.getCode() == 0) {
-                return "redirect:/login.html";
+                return "redirect:http://auth.gulimall.com/login.html";
             }else {
                 Map<String, String> collect = new HashMap<>();
-                collect.put("msg",regist.getData(new TypeReference<String>(){}));
+                collect.put("msg",regist.getData("msg",new TypeReference<String>(){}));
                 redirectAttributes.addFlashAttribute("errors",collect);
                 return "redirect:http://auth.gulimall.com/reg.html";
             }
@@ -52,5 +53,15 @@ public class indexController {
             return "redirect:http://auth.gulimall.com/reg.html";
         }
 //        return "redirect:/login.html";
+    }
+    @PostMapping("/login")
+    public String login(UserLoginVo userLoginVo){
+        R login = memberfeiginService.login(userLoginVo);
+        if (login.getCode()==0){
+            return "redirect:http://gulimall.com";
+        }else {
+            return "redirect:http://auth.gulimall.com/login.html";
+        }
+
     }
 }
