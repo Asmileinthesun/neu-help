@@ -1,12 +1,13 @@
-package com.hzx.vo;
+package com.hzx.common.vo;
 
 import lombok.Data;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.Date;
 @ToString
 @Data
-public class MemberVo {
+public class MemberVo  {
     private Long id;
     /**
      * 会员等级id

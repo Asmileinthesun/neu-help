@@ -2,11 +2,11 @@ package com.hzx.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.hzx.common.constant.AuthServerConstant;
 import com.hzx.common.utils.HttpUtils;
 import com.hzx.common.utils.R;
 import com.hzx.feign.MemberfeiginService;
-import com.hzx.vo.MemberVo;
-import com.hzx.vo.SociUserinfo;
+import com.hzx.common.vo.MemberVo;
 import com.hzx.vo.SocialUser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 @Slf4j
@@ -24,7 +25,7 @@ public class OAuth2Controller {
     @Autowired
     MemberfeiginService memberfeiginService;
     @GetMapping("/oauth2.0/gitee/success")
-    public String gitee(@RequestParam("code")String code, HttpSession session) throws Exception {
+    public String gitee(@RequestParam("code")String code, HttpSession session, HttpServletResponse servletResponse) throws Exception {
         HashMap<String,String> map = new HashMap<>();
         map.put("grant_type","authorization_code");
         map.put("code",code);
@@ -45,7 +46,10 @@ public class OAuth2Controller {
             if (oauthlogin.getCode()==0) {
                 MemberVo data = oauthlogin.getData("data", new TypeReference<MemberVo>() {});
                 log.info("登陆成功{}",data.toString());
-                session.setAttribute("loginUser",data);
+                session.setAttribute(AuthServerConstant.LOGIN_USER,data);
+//                System.out.println("data = " + session.getAttribute("loginUser"));
+//                System.out.println();
+//                servletResponse.addCookie(new Cookie("JSESSIONID","data").setDomain());
                 return "redirect:http://gulimall.com";
             }else {
                 return  "redirect:http://auth.gulimall.com/login.html";
