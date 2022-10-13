@@ -8,6 +8,8 @@ import com.hzx.member.exception.PhoneException;
 import com.hzx.member.exception.UsernameException;
 import com.hzx.member.feign.CouponFeign;
 import com.hzx.member.vo.MemberLoginVo;
+import com.hzx.member.vo.SociUserinfo;
+import com.hzx.member.vo.SocialUser;
 import com.hzx.member.vo.UserRegistVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +35,16 @@ public class MemberController {
     private MemberService memberService;
     @Autowired
     CouponFeign couponFeign;
+
+    @PostMapping("/oauth2/login")
+    public R oauthlogin(@RequestBody SocialUser socialUser) throws Exception {
+        MemberEntity memberEntity= memberService.login(socialUser);
+        if (memberEntity != null) {
+            return R.ok().setData(memberEntity);
+        }else {
+            return R.error(BizCodeEnume.LOGINACCT_PASSWORD_EXCEPTION.getCode(), BizCodeEnume.LOGINACCT_PASSWORD_EXCEPTION.getMsg());
+        }
+    }
     @PostMapping("/regist")
     public R regist(@RequestBody UserRegistVo userRegistVo){
         try {
@@ -55,7 +67,6 @@ public class MemberController {
         }else {
             return R.error(BizCodeEnume.LOGINACCT_PASSWORD_EXCEPTION.getCode(), BizCodeEnume.LOGINACCT_PASSWORD_EXCEPTION.getMsg());
         }
-
     }
     @RequestMapping("test")
     public R test(){

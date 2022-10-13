@@ -1,6 +1,7 @@
 package com.hzx.feign;
 
 import com.hzx.common.utils.R;
+import com.hzx.vo.SocialUser;
 import com.hzx.vo.UserLoginVo;
 import com.hzx.vo.UserRegister;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -16,4 +17,6 @@ public interface MemberfeiginService {
     @PostMapping("/member/member/login")
     R login(@RequestBody UserLoginVo memberLoginVo);
 
+    @PostMapping("/member/member/oauth2/login")
+    R oauthlogin(@RequestBody SocialUser socialUser);
 }

@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.hzx.common.utils.PageUtils;
 import com.hzx.member.entity.MemberEntity;
 import com.hzx.member.vo.MemberLoginVo;
+import com.hzx.member.vo.SociUserinfo;
+import com.hzx.member.vo.SocialUser;
 import com.hzx.member.vo.UserRegistVo;
 
 import java.util.Map;
@@ -24,5 +26,7 @@ public interface MemberService extends IService<MemberEntity> {
     void checkUserNameUnique(String userName);
 
     MemberEntity login(MemberLoginVo memberLoginVo);
+
+    MemberEntity login(SocialUser socialUser) throws Exception;
 }
 
