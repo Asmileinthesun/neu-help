@@ -55,8 +55,12 @@ spring:
         - id: gulimail_search_route
           uri: lb://gulimail-search
           predicates:
-            - Host=**.gulimall.com
+            - Host=search.gulimall.com
 
+        - id: gulimail_cart_route
+          uri: lb://gulimall-cart
+          predicates:
+            - Host=cart.gulimall.com
 #
 #        - id: qq_route
 #          uri: https://www.qq.com
