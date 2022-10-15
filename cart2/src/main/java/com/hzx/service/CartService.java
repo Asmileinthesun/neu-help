@@ -24,4 +24,10 @@ public interface CartService {
     CartVo getCart() throws ExecutionException, InterruptedException;
 
     void clearCartInfo(String cartKey);
+
+    void checkItem(Long skuId, Integer checked);
+
+    void changeItemCount(Long skuId, Integer num);
+
+    void deleteIdCartInfo(Integer skuId);
 }
