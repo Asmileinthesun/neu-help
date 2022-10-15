@@ -10,7 +10,7 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 
 @EnableRedisHttpSession
 ////@EnableCaching
-//@EnableFeignClients(basePackages = "com.hzx")
+@EnableFeignClients(basePackages = "com.hzx.feign")
 @EnableDiscoveryClient
 //@MapperScan("com.hzx.product.dao")
 @SpringBootApplication(exclude = DataSourceAutoConfiguration.class)

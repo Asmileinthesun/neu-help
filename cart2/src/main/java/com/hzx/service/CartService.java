@@ -4,6 +4,10 @@ package com.hzx.service;
 //import com.xunqi.gulimall.cart.vo.CartVo;
 
 
+import com.hzx.vo.CartItemVo;
+
+import java.util.concurrent.ExecutionException;
+
 /**
  * @Description:
  * @Created: with IntelliJ IDEA.
@@ -12,4 +16,7 @@ package com.hzx.service;
  **/
 public interface CartService {
 
+    CartItemVo addToCart(Long skuId, Integer num) throws ExecutionException, InterruptedException;
+
+    CartItemVo getCartItem(Long skuId);
 }
