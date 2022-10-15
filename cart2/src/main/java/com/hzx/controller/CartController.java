@@ -4,6 +4,7 @@ import com.hzx.interceptor.CartInterceptor;
 import com.hzx.service.CartService;
 import com.hzx.to.UserInfoTo;
 import com.hzx.vo.CartItemVo;
+import com.hzx.vo.CartVo;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,9 +43,8 @@ public class CartController {
     @GetMapping(value = "/cart.html")
     public String cartListPage(Model model) throws ExecutionException, InterruptedException {
         //快速得到用户信息：id,user-key
-         UserInfoTo userInfoTo = CartInterceptor.toThreadLocal.get();
-
-        System.out.println("userInfoTo = " + userInfoTo);
+        CartVo cartVo = cartService.getCart();
+        model.addAttribute("cart",cartVo);
         return "cartList";
     }
     @GetMapping(value = "/addToCartSuccessPage.html")

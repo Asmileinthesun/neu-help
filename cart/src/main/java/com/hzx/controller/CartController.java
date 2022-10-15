@@ -57,8 +57,8 @@ public class CartController {
     @GetMapping(value = "/cart.html")
     public String cartListPage(Model model) throws ExecutionException, InterruptedException {
         //快速得到用户信息：id,user-key
-         UserInfoTo userInfoTo = CartInterceptor.toThreadLocal.get();
-        System.out.println("userInfoTo = " + userInfoTo);
+//         UserInfoTo userInfoTo = CartInterceptor.toThreadLocal.get();
+//        System.out.println("userInfoTo = " + userInfoTo);
         CartVo cartVo = cartService.getCart();
         model.addAttribute("cart",cartVo);
         return "cartList";
