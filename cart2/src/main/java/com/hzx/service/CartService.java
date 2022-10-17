@@ -7,6 +7,7 @@ package com.hzx.service;
 import com.hzx.vo.CartItemVo;
 import com.hzx.vo.CartVo;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -30,4 +31,6 @@ public interface CartService {
     void changeItemCount(Long skuId, Integer num);
 
     void deleteIdCartInfo(Integer skuId);
+
+    List<CartItemVo> getUserCartItems();
 }
