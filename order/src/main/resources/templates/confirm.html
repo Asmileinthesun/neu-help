@@ -1005,6 +1005,7 @@
     function getFare(addrId) {
     	//给表单回填选择的地址
 		$("#addrInput").val(addrId);
+        console.log(addrId)
         $.get("http://gulimall.com/api/ware/wareinfo/fare?addrId=" + addrId, function (resp) {
             console.log(resp);
             $("#fare").text(resp.data.fare);
