@@ -5,7 +5,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 库存工作单
@@ -14,6 +17,8 @@ import lombok.Data;
  * @email sunlightcs@gmail.com
  * @date 2022-09-02 00:46:52
  */
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 @TableName("wms_ware_order_task_detail")
 public class WareOrderTaskDetailEntity implements Serializable {
@@ -41,4 +46,7 @@ public class WareOrderTaskDetailEntity implements Serializable {
 	 */
 	private Long taskId;
 
+
+	public WareOrderTaskDetailEntity(Object o, Long skuId, String s, Integer num, Long id, Long wareId, int i) {
+	}
 }

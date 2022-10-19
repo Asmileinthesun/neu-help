@@ -6,6 +6,7 @@ import com.hzx.ware.entity.WareSkuEntity;
 import com.hzx.ware.vo.SkuHasStockVo;
 import com.hzx.ware.vo.WareSkuLockVo;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +25,6 @@ public interface WareSkuService extends IService<WareSkuEntity> {
 
     List<SkuHasStockVo> getSkuHasStock(List<Long> skuids);
 
-    Boolean orderLockStock(WareSkuLockVo vo);
+    Boolean orderLockStock(WareSkuLockVo vo) throws InvocationTargetException, IllegalAccessException;
 }
 
