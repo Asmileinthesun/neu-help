@@ -1,5 +1,6 @@
 package com.hzx.ware.controller;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,8 @@ public class WareSkuController {
             return R.ok();
         }catch (NoStockException e){
             return R.error(BizCodeEnume.NO_STOCK_EXCEPTION.getCode(),e.getMessage());
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
