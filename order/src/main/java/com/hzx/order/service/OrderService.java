@@ -7,6 +7,7 @@ import com.hzx.order.vo.OrderConfirmVo;
 import com.hzx.order.vo.OrderSubmitVo;
 import com.hzx.order.vo.SubmitOrderResponseVo;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -25,7 +26,7 @@ public interface OrderService extends IService<OrderEntity> {
 
     SubmitOrderResponseVo submitOrder(OrderSubmitVo vo);
 
-    void closeOrder(OrderEntity orderEntity);
+    void closeOrder(OrderEntity orderEntity) throws InvocationTargetException, IllegalAccessException;
 
     OrderEntity getOrderByOrderSn(String orderSn);
 }

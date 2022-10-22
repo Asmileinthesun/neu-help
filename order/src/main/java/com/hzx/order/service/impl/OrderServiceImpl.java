@@ -3,6 +3,7 @@ package com.hzx.order.service.impl;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.hzx.common.exception.NoStockException;
+import com.hzx.common.to.mq.OrderTo;
 import com.hzx.common.utils.R;
 import com.hzx.common.vo.MemberVo;
 import com.hzx.order.entity.OrderItemEntity;
@@ -17,12 +18,14 @@ import com.hzx.order.service.PaymentInfoService;
 import com.hzx.order.to.OrderCreateTo;
 import com.hzx.order.to.SpuInfoVo;
 import com.hzx.order.vo.*;
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
@@ -262,8 +265,29 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     }
 
     @Override
-    public void closeOrder(OrderEntity orderEntity) {
+    public void closeOrder(OrderEntity entity) throws InvocationTargetException, IllegalAccessException {
+        //查询当前这个订单的最新状态
+        OrderEntity orderEntity = this.getById(entity.getId());
+        if (orderEntity.getStatus() == OrderStatusEnum.CREATE_NEW.getCode()) {
+            //关单
+            OrderEntity update = new OrderEntity();
+            update.setId(entity.getId());
+            update.setStatus(OrderStatusEnum.CANCLED.getCode());
+            this.updateById(update);
+            OrderTo orderTo = new OrderTo();
+            BeanUtils.copyProperties(orderEntity, orderTo);
+            //发给MQ一个
+            try {
+                //TODO 保证消息一定会发送出去，每一个消息都可以做好日志记录（给数据库保存每一个消息的详细信息）。
+                //TODO 定期扫描数据库将失败的消息再发送一遍；
+                rabbitTemplate.convertAndSend("order-event-exchange", "order.release.other", orderTo);
+            } catch (Exception e) {
+                //TODO 将没法送成功的消息进行重试发送。
+//                while)
+            }
 
+
+        }
     }
 
     @Override
