@@ -46,7 +46,11 @@ public class WareOrderTaskDetailEntity implements Serializable {
 	 */
 	private Long taskId;
 
+	private Long wareId;
 
-	public WareOrderTaskDetailEntity(Object o, Long skuId, String s, Integer num, Long id, Long wareId, int i) {
-	}
+	private Integer lockStatus;
+
+
+
+
 }

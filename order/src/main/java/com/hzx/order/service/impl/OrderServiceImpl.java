@@ -261,6 +261,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         }
     }
 
+    @Override
+    public void closeOrder(OrderEntity orderEntity) {
+
+    }
+
     /**
      * 保存订单所有数据
      * @param orderCreateTo
