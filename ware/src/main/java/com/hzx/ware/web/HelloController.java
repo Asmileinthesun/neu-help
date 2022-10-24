@@ -1,6 +1,7 @@
-package com.hzx.order.web;
+package com.hzx.ware.web;
 
-import com.hzx.order.entity.OrderEntity;
+import com.hzx.common.to.mq.OrderTo;
+//import com.hzx.order.entity.OrderEntity;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -29,20 +30,14 @@ public class HelloController {
     public String createOrderTest() {
 
         //订单下单成功
-        OrderEntity orderEntity = new OrderEntity();
+        OrderTo orderEntity = new OrderTo();
         orderEntity.setOrderSn(UUID.randomUUID().toString());
         orderEntity.setModifyTime(new Date());
 
         //给MQ发送消息
-        rabbitTemplate.convertAndSend("order-event-exchange","order.create.order",orderEntity);
+        rabbitTemplate.convertAndSend("stock-event-exchange","stock.locked",orderEntity);
 //        stock.locked
         return "ok";
-    }
-
-    @GetMapping(value = "/{page}.html")
-    public String listPage(@PathVariable("page") String page) {
-
-        return page;
     }
 
 }

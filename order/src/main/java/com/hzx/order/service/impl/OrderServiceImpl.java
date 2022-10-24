@@ -264,29 +264,34 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         }
     }
 
+    /**
+     * 关闭订单
+     * @param orderEntity
+     */
     @Override
-    public void closeOrder(OrderEntity entity) throws InvocationTargetException, IllegalAccessException {
-        //查询当前这个订单的最新状态
-        OrderEntity orderEntity = this.getById(entity.getId());
-        if (orderEntity.getStatus() == OrderStatusEnum.CREATE_NEW.getCode()) {
-            //关单
-            OrderEntity update = new OrderEntity();
-            update.setId(entity.getId());
-            update.setStatus(OrderStatusEnum.CANCLED.getCode());
-            this.updateById(update);
+    public void closeOrder(OrderEntity orderEntity) throws InvocationTargetException, IllegalAccessException {
+
+        //关闭订单之前先查询一下数据库，判断此订单状态是否已支付
+        OrderEntity orderInfo = this.getOne(new QueryWrapper<OrderEntity>().
+                eq("order_sn",orderEntity.getOrderSn()));
+
+        if (orderInfo.getStatus().equals(OrderStatusEnum.CREATE_NEW.getCode())) {
+            //代付款状态进行关单
+            OrderEntity orderUpdate = new OrderEntity();
+            orderUpdate.setId(orderInfo.getId());
+            orderUpdate.setStatus(OrderStatusEnum.CANCLED.getCode());
+            this.updateById(orderUpdate);
+
+            // 发送消息给MQ
             OrderTo orderTo = new OrderTo();
-            BeanUtils.copyProperties(orderEntity, orderTo);
-            //发给MQ一个
+            BeanUtils.copyProperties(orderInfo, orderTo);
+
             try {
-                //TODO 保证消息一定会发送出去，每一个消息都可以做好日志记录（给数据库保存每一个消息的详细信息）。
-                //TODO 定期扫描数据库将失败的消息再发送一遍；
+                //TODO 确保每个消息发送成功，给每个消息做好日志记录，(给数据库保存每一个详细信息)保存每个消息的详细信息
                 rabbitTemplate.convertAndSend("order-event-exchange", "order.release.other", orderTo);
             } catch (Exception e) {
-                //TODO 将没法送成功的消息进行重试发送。
-//                while)
+                //TODO 定期扫描数据库，重新发送失败的消息
             }
-
-
         }
     }
 

@@ -17,9 +17,10 @@ import com.hzx.ware.vo.OrderVo;
 import com.hzx.ware.vo.SkuHasStockVo;
 import com.hzx.ware.vo.WareSkuLockVo;
 import lombok.Data;
-import org.apache.commons.beanutils.BeanUtils;
+//import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -186,7 +187,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
                     //当前仓库锁失败，重试下一个仓库
                 }
             }
-            if (skuStocked == false) {
+            if (!skuStocked) {
                 //当前商品所有仓库都没有锁住
                 throw new NoStockException(skuId);
             }

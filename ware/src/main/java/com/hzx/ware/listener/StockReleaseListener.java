@@ -25,7 +25,7 @@ public class StockReleaseListener {
     @RabbitHandler
     public void handleStockLockedRelease(StockLockedTo to, Message message, Channel channel) throws IOException {
 
-        System.out.println("收到解锁库存的消息...");
+        System.err.println("收到解锁库存的消息..."+to.toString());
         try{
             //当前消息是否被第二次及以后（重新）派发过来了。
 //            Boolean redelivered = message.getMessageProperties().getRedelivered();
@@ -39,7 +39,7 @@ public class StockReleaseListener {
 
     @RabbitHandler
     public void handleOrderCloseRelease(OrderTo orderTo, Message message, Channel channel) throws IOException {
-        System.out.println("订单关闭准备解锁库存...");
+        System.err.println("订单关闭准备解锁库存..."+orderTo.toString());
         try{
             wareSkuService.unlockStock(orderTo);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
