@@ -328,6 +328,37 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         return payVo;
     }
 
+
+    /**
+     * 查询当前用户所有订单数据
+     * @param params
+     * @return
+     */
+    @Override
+    public PageUtils queryPageWithItem(Map<String, Object> params) {
+
+        MemberVo memberResponseVo = LoginUserInterceptor.loginUser.get();
+
+        IPage<OrderEntity> page = this.page(
+                new Query<OrderEntity>().getPage(params),
+                new QueryWrapper<OrderEntity>()
+                        .eq("member_id",memberResponseVo.getId()).orderByDesc("create_time")
+        );
+
+        //遍历所有订单集合
+        List<OrderEntity> orderEntityList = page.getRecords().stream().map(order -> {
+            //根据订单号查询订单项里的数据
+            List<OrderItemEntity> orderItemEntities = orderItemService.list(new QueryWrapper<OrderItemEntity>()
+                    .eq("order_sn", order.getOrderSn()));
+            order.setOrderItemEntityList(orderItemEntities);
+            return order;
+        }).collect(Collectors.toList());
+
+        page.setRecords(orderEntityList);
+
+        return new PageUtils(page);
+    }
+
     /**
      * 保存订单所有数据
      * @param orderCreateTo
