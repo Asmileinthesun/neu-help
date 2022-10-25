@@ -18,8 +18,8 @@ import com.hzx.order.service.PaymentInfoService;
 import com.hzx.order.to.OrderCreateTo;
 import com.hzx.order.to.SpuInfoVo;
 import com.hzx.order.vo.*;
-import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -241,7 +241,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                 if (r.getCode() == 0) {
                     //锁定成功
                     responseVo.setOrder(order.getOrder());
-                    // int i = 10/0;
+//                     int i = 10/0;
 
                     //TODO 订单创建成功，发送消息给MQ
                     rabbitTemplate.convertAndSend("order-event-exchange","order.create.order",order.getOrder());

@@ -1,8 +1,5 @@
 package com.hzx.ware.listener;
 
-//import com.atguigu.common.to.mq.OrderTo;
-//import com.atguigu.common.to.mq.StockLockedTo;
-//import com.atguigu.gulimall.ware.service.WareSkuService;
 import com.hzx.common.to.mq.OrderTo;
 import com.hzx.common.to.mq.StockLockedTo;
 import com.hzx.ware.service.WareSkuService;
