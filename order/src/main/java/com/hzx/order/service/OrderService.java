@@ -5,6 +5,7 @@ import com.hzx.common.utils.PageUtils;
 import com.hzx.order.entity.OrderEntity;
 import com.hzx.order.vo.OrderConfirmVo;
 import com.hzx.order.vo.OrderSubmitVo;
+import com.hzx.order.vo.PayVo;
 import com.hzx.order.vo.SubmitOrderResponseVo;
 
 import java.lang.reflect.InvocationTargetException;
@@ -29,5 +30,7 @@ public interface OrderService extends IService<OrderEntity> {
     void closeOrder(OrderEntity orderEntity) throws InvocationTargetException, IllegalAccessException;
 
     OrderEntity getOrderByOrderSn(String orderSn);
+
+    PayVo getOrderPay(String orderSn);
 }
 
