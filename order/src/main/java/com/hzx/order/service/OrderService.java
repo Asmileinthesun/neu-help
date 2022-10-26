@@ -3,10 +3,7 @@ package com.hzx.order.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hzx.common.utils.PageUtils;
 import com.hzx.order.entity.OrderEntity;
-import com.hzx.order.vo.OrderConfirmVo;
-import com.hzx.order.vo.OrderSubmitVo;
-import com.hzx.order.vo.PayVo;
-import com.hzx.order.vo.SubmitOrderResponseVo;
+import com.hzx.order.vo.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
@@ -34,5 +31,9 @@ public interface OrderService extends IService<OrderEntity> {
     PayVo getOrderPay(String orderSn);
 
     PageUtils queryPageWithItem(Map<String, Object> params);
+
+    String handlePayResult(PayAsyncVo asyncVo);
+
+    String asyncNotify(String notifyData);
 }
 

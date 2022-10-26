@@ -6,7 +6,9 @@ import com.hzx.common.exception.NoStockException;
 import com.hzx.common.to.mq.OrderTo;
 import com.hzx.common.utils.R;
 import com.hzx.common.vo.MemberVo;
+import com.hzx.order.constant.PayConstant;
 import com.hzx.order.entity.OrderItemEntity;
+import com.hzx.order.entity.PaymentInfoEntity;
 import com.hzx.order.enume.OrderStatusEnum;
 import com.hzx.order.feign.CartFeignService;
 import com.hzx.order.feign.MemberFeignService;
@@ -357,6 +359,98 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         page.setRecords(orderEntityList);
 
         return new PageUtils(page);
+    }
+
+    /**
+     * 处理支付宝的支付结果
+     * @param asyncVo
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public String handlePayResult(PayAsyncVo asyncVo) {
+
+        //保存交易流水信息
+        PaymentInfoEntity paymentInfo = new PaymentInfoEntity();
+        paymentInfo.setOrderSn(asyncVo.getOut_trade_no());
+        paymentInfo.setAlipayTradeNo(asyncVo.getTrade_no());
+        paymentInfo.setTotalAmount(new BigDecimal(asyncVo.getBuyer_pay_amount()));
+        paymentInfo.setSubject(asyncVo.getBody());
+        paymentInfo.setPaymentStatus(asyncVo.getTrade_status());
+        paymentInfo.setCreateTime(new Date());
+        paymentInfo.setCallbackTime(asyncVo.getNotify_time());
+        //添加到数据库中
+        this.paymentInfoService.save(paymentInfo);
+
+        //修改订单状态
+        //获取当前状态
+        String tradeStatus = asyncVo.getTrade_status();
+
+        if (tradeStatus.equals("TRADE_SUCCESS") || tradeStatus.equals("TRADE_FINISHED")) {
+            //支付成功状态
+            String orderSn = asyncVo.getOut_trade_no(); //获取订单号
+            this.updateOrderStatus(orderSn,OrderStatusEnum.PAYED.getCode(), PayConstant.ALIPAY);
+        }
+
+        return "success";
+    }
+
+    /**
+     * 微信异步通知结果
+     * @param notifyData
+     * @return
+     */
+    @Override
+    public String asyncNotify(String notifyData) {
+
+//        //签名效验
+//        PayResponse payResponse = bestPayService.asyncNotify(notifyData);
+//        log.info("payResponse={}",payResponse);
+//
+//        //2.金额效验（从数据库查订单）
+//        OrderEntity orderEntity = this.getOrderByOrderSn(payResponse.getOrderId());
+//
+//        //如果查询出来的数据是null的话
+//        //比较严重(正常情况下是不会发生的)发出告警：钉钉、短信
+//        if (orderEntity == null) {
+//            //TODO 发出告警，钉钉，短信
+//            throw new RuntimeException("通过订单编号查询出来的结果是null");
+//        }
+//
+//        //判断订单状态状态是否为已支付或者是已取消,如果不是订单状态不是已支付状态
+//        Integer status = orderEntity.getStatus();
+//        if (status.equals(OrderStatusEnum.PAYED.getCode()) || status.equals(OrderStatusEnum.CANCLED.getCode())) {
+//            throw new RuntimeException("该订单已失效,orderNo=" + payResponse.getOrderId());
+//        }
+//
+//        /*//判断金额是否一致,Double类型比较大小，精度问题不好控制
+//        if (orderEntity.getPayAmount().compareTo(BigDecimal.valueOf(payResponse.getOrderAmount())) != 0) {
+//            //TODO 告警
+//            throw new RuntimeException("异步通知中的金额和数据库里的不一致,orderNo=" + payResponse.getOrderId());
+//        }*/
+//
+//        //3.修改订单支付状态
+//        //支付成功状态
+//        String orderSn = orderEntity.getOrderSn();
+//        this.updateOrderStatus(orderSn,OrderStatusEnum.PAYED.getCode(),PayConstant.WXPAY);
+//
+//        //4.告诉微信不要再重复通知了
+//        return "<xml>\n" +
+//                "  <return_code><![CDATA[SUCCESS]]></return_code>\n" +
+//                "  <return_msg><![CDATA[OK]]></return_msg>\n" +
+//                "</xml>";
+        return null;
+    }
+
+
+    /**
+     * 修改订单状态
+     * @param orderSn
+     * @param code
+     */
+    private void updateOrderStatus(String orderSn, Integer code,Integer payType) {
+
+        this.baseMapper.updateOrderStatus(orderSn,code,payType);
     }
 
     /**
