@@ -22,6 +22,7 @@
 	    <module>auth-server</module>
 	    <module>cart</module>
 	    <module>cart2</module>
+	    <module>gulimall-seckill</module>
 	    <!--	    <module>third-party</module>-->
     </modules>
     <name>gulimarket</name>

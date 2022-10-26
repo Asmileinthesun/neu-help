@@ -13,6 +13,7 @@ import com.hzx.coupon.entity.SeckillSkuNoticeEntity;
 import com.hzx.coupon.service.SeckillSkuNoticeService;
 
 
+
 @Service("seckillSkuNoticeService")
 public class SeckillSkuNoticeServiceImpl extends ServiceImpl<SeckillSkuNoticeDao, SeckillSkuNoticeEntity> implements SeckillSkuNoticeService {
 
@@ -25,5 +26,4 @@ public class SeckillSkuNoticeServiceImpl extends ServiceImpl<SeckillSkuNoticeDao
 
         return new PageUtils(page);
     }
-
 }
