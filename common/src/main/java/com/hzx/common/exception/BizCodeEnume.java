@@ -25,4 +25,6 @@ public enum BizCodeEnume {
     public String getMsg(){
         return msg;
     }
+
+
 }
