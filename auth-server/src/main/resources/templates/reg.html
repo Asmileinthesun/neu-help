@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:o="http://www.w3.org/1999/xhtml">
 
 <head>
     <meta charset="utf-8"/>
@@ -5979,13 +5979,20 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
         <div class="register-box">
             <label  class="other_label">
                 <span>中国 0086∨</span>
-                <input name="phone" class="phone" maxlength="20" type="text" placeholder="建议使用常用手机">
+                <input name="phone" id="phoneNum" class="phone" maxlength="20" type="text" placeholder="建议使用常用手机">
             </label>
 			<div class="tips" style="color: red"
 				 th:text="${errors != null ? (#maps.containsKey(errors, 'phone') ? errors.phone : '') : ''}">
 
 			</div>
         </div>
+		<div class="register-box2">
+			<label  class="other_label2">
+				<span>中国 0086∨</span>
+				<input  id="EmailNum" class="email" maxlength="20" type="text" placeholder="建议使用常用邮箱">
+			</label>
+
+		</div>
         <div class="register-box">
             <label  class="other_label">验 证 码
                 <input name="code" maxlength="20" type="text" placeholder="请输入验证码" class="caa">
@@ -6256,7 +6263,7 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
                 //正在倒计时中
             } else {
                 //1、给指定手机号发送验证码
-                $.get("/sms/sendCode?phone=" + $("#phoneNum").val(), function (data) {
+                $.get("/sendcode?length=4&email=" + $("#EmailNum").val(), function (data) {
                     if (data.code != 0) {
                         alert(data.msg);
                     }
