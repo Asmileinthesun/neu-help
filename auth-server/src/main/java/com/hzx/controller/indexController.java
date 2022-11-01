@@ -6,6 +6,7 @@ import com.hzx.common.exception.BizCodeEnume;
 import com.hzx.common.utils.R;
 import com.hzx.common.vo.MemberVo;
 import com.hzx.config.SendEmail;
+import com.hzx.config.SmsCom;
 import com.hzx.feign.MemberfeiginService;
 import com.hzx.vo.UserLoginVo;
 import com.hzx.vo.UserRegister;
@@ -35,6 +36,9 @@ public class indexController {
 
     @Autowired
     StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    SmsCom smsCom;
     @ResponseBody
     @GetMapping("/sendcode")
     public R sendemail(@RequestParam("email") String email, @RequestParam("length")int length){
@@ -66,6 +70,29 @@ public class indexController {
 
         return R.ok();
     }
+
+    @ResponseBody
+    @GetMapping("/sendphonecode")
+    public R sendphone(@RequestParam("phone")String phone){
+
+        String s = stringRedisTemplate.opsForValue().get(AuthServerConstant.SMS_CODE_CACHE_PREFIX + phone);
+        if (!StringUtils.isEmpty(s)){
+            long l = Long.parseLong(s.split("_")[1]);
+            if (System.currentTimeMillis()-l<60000){
+                return R.error(BizCodeEnume.SMS_CODE_EXCEPTION.getCode(),BizCodeEnume.SMS_CODE_EXCEPTION.getMsg());
+            }
+        }
+        //创建10位发验证码
+        Random random=new Random();
+        String str="";
+        for(int i=0;i<4;i++) {
+            int n=random.nextInt(10);
+            str+=n;
+        }
+        smsCom.phone(phone,str);
+        stringRedisTemplate.opsForValue().set(AuthServerConstant.SMS_CODE_CACHE_PREFIX+phone,str+"_"+System.currentTimeMillis(),10, TimeUnit.MINUTES);
+        return R.ok();
+    }
     @PostMapping("/regist")
     public String regist(@Valid UserRegister userRegister, BindingResult result,
                          RedirectAttributes redirectAttributes) {
@@ -77,20 +104,30 @@ public class indexController {
 
         }
         String code = userRegister.getCode();
-        if (code.equals("1234")){
-            R regist = memberfeiginService.regist(userRegister);
-            if (regist.getCode() == 0) {
-                return "redirect:http://auth.gulimall.com/login.html";
-            }else {
+        String redisCode = stringRedisTemplate.opsForValue().get(AuthServerConstant.SMS_CODE_CACHE_PREFIX + userRegister.getPhone());
+        if (!StringUtils.isEmpty(redisCode)) {
+            if (code.equals(redisCode.split("_")[0])) {
+                R regist = memberfeiginService.regist(userRegister);
+                if (regist.getCode() == 0) {
+                    return "redirect:http://auth.gulimall.com/login.html";
+                } else {
+                    Map<String, String> collect = new HashMap<>();
+                    collect.put("msg", regist.getData("msg", new TypeReference<String>() {
+                    }));
+                    redirectAttributes.addFlashAttribute("errors", collect);
+                    return "redirect:http://auth.gulimall.com/reg.html";
+                }
+            } else {
                 Map<String, String> collect = new HashMap<>();
-                collect.put("msg",regist.getData("msg",new TypeReference<String>(){}));
-                redirectAttributes.addFlashAttribute("errors",collect);
+                collect.put("code", "验证码错误");
+                redirectAttributes.addFlashAttribute("errors", collect);
                 return "redirect:http://auth.gulimall.com/reg.html";
             }
         }else {
-            Map<String, String> collect = new HashMap<>();
-            collect.put("code","验证码错误");
-            redirectAttributes.addFlashAttribute("errors",collect);
+            //效验出错回到注册页面
+            Map<String, String> errors = new HashMap<>();
+            errors.put("code","验证码错误");
+            redirectAttributes.addFlashAttribute("errors",errors);
             return "redirect:http://auth.gulimall.com/reg.html";
         }
 //        return "redirect:/login.html";

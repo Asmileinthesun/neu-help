@@ -5994,7 +5994,7 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
 
 		</div>
         <div class="register-box">
-            <label  class="other_label">验 证 码
+            <label  class="other_label">邮箱验 证 码
                 <input name="code" maxlength="20" type="text" placeholder="请输入验证码" class="caa">
             </label>
             <a id="sendCode">发送验证码</a>
@@ -6003,6 +6003,17 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
 
 			</div>
         </div>
+		<div class="register-box">
+			<label  class="other_label">手机验 证 码
+				<input name="code" maxlength="20" type="text" placeholder="请输入验证码" class="caa">
+			</label>
+			<a id="sendCode2">发送验证码</a>
+			<div class="tips" style="color: red"
+				 th:text="${errors != null ? (#maps.containsKey(errors, 'code') ? errors.code : '') : ''}">
+
+			</div>
+		</div>
+
         <div class="arguement">
             <input type="checkbox" id="xieyi"> 阅读并同意
             <a href="/static/reg/#">《谷粒商城用户注册协议》</a>
@@ -6272,6 +6283,22 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
             }
         });
     });
+	$(function () {
+		$("#sendCode2").click(function () {
+			//2、倒计时
+			if ($(this).hasClass("disabled")) {
+				//正在倒计时中
+			} else {
+				//1、给指定手机号发送验证码
+				$.get("/sendphonecode?phone=" + $("#phoneNum").val(), function (data) {
+					if (data.code != 0) {
+						alert(data.msg);
+					}
+				});
+				timeoutChangeStyle2();
+			}
+		});
+	});
     var num = 60;
 
     function timeoutChangeStyle() {
@@ -6287,7 +6314,19 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
         }
         num--;
     }
-
+	function timeoutChangeStyle2() {
+		$("#sendCode2").attr("class", "disabled");
+		if (num == 0) {
+			$("#sendCode2").text("发送验证码");
+			num = 60;
+			$("#sendCode2").attr("class", "");
+		} else {
+			var str = num + "s 后再次发送";
+			$("#sendCode2").text(str);
+			setTimeout("timeoutChangeStyle2()", 1000);
+		}
+		num--;
+	}
 </script>
 </body>
 

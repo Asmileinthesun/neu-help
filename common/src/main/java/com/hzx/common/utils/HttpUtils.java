@@ -1,5 +1,18 @@
 package com.hzx.common.utils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -18,24 +31,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-/**
- * @Description:
- * @Created: with IntelliJ IDEA.
- * @author: 夏沫止水
- * @createTime: 2020-06-27 09:33
- **/
 public class HttpUtils {
 
     /**
@@ -292,15 +287,12 @@ public class HttpUtils {
         try {
             SSLContext ctx = SSLContext.getInstance("TLS");
             X509TrustManager tm = new X509TrustManager() {
-                @Override
                 public X509Certificate[] getAcceptedIssuers() {
                     return null;
                 }
-                @Override
                 public void checkClientTrusted(X509Certificate[] xcs, String str) {
 
                 }
-                @Override
                 public void checkServerTrusted(X509Certificate[] xcs, String str) {
 
                 }
@@ -317,5 +309,4 @@ public class HttpUtils {
             throw new RuntimeException(ex);
         }
     }
-
 }

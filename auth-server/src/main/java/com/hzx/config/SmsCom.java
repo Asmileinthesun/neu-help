@@ -1,51 +1,24 @@
-package com.hzx.te;
-
+package com.hzx.config;
 
 import com.hzx.common.utils.HttpUtils;
-import com.hzx.config.SendEmail;
-//import com.netflix.client.http.HttpResponse;
-import com.hzx.config.SmsCom;
+import lombok.Data;
 import org.apache.http.HttpResponse;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
+@ConfigurationProperties(prefix = "spring.sms")
+@Data
+@Component
+public class SmsCom {
+    private String appcode;
 
-@RunWith(value = SpringRunner.class)
-@SpringBootTest
-public class test1 {
-    @Test
-    public void sendemail(){
-        SendEmail sendEmail=new SendEmail();
-        //设置要发送的邮箱
-        sendEmail.setReceiveMailAccount("2830768536@qq.com");
-        //创建10位发验证码
-        Random random=new Random();
-        String str="";
-        for(int i=0;i<4;i++) {
-            int n=random.nextInt(10);
-            str+=n;
-        }
-        sendEmail.setInfo(str);
-        try {
-            sendEmail.Send();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    @Test
-    public void phone(){
+    public void phone(String phone,String code){
         String host = "https://dfsns.market.alicloudapi.com";
         String path = "/data/send_sms";
         String method = "POST";
-        String appcode = "c5716c1ea71b407498fed097c177431e";
+//        = "c5716c1ea71b407498fed097c177431e";
         Map<String, String> headers = new HashMap<String, String>();
         //最后在header中的格式(中间是英文空格)为Authorization:APPCODE 83359fd73fe94948385f570e3c139105
         headers.put("Authorization", "APPCODE " + appcode);
@@ -53,8 +26,8 @@ public class test1 {
         headers.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
         Map<String, String> querys = new HashMap<String, String>();
         Map<String, String> bodys = new HashMap<String, String>();
-        bodys.put("content", "code:1234");
-        bodys.put("phone_number", "");
+        bodys.put("content", "code:"+code);
+        bodys.put("phone_number", phone);
         bodys.put("template_id", "TPL_0000");
 
 
@@ -75,13 +48,6 @@ public class test1 {
         } catch (Exception e) {
             e.printStackTrace();
 
-    }
-    }
-
-    @Autowired
-    SmsCom smsCom;
-    @Test
-    public void phone2(){
-        smsCom.phone("15702681331","1234");
+        }
     }
 }
