@@ -24,11 +24,11 @@ public class Sample {
 
     public static void main(String[] args_) throws Exception {
         java.util.List<String> args = java.util.Arrays.asList(args_);
-        com.aliyun.dysmsapi20170525.Client client = Sample.createClient("LTAI5tExfEPUsgnsr8LJdW8M", "YxDxjVOJuVm5dGDt3DRuUMaQEJLtwZ");
+        com.aliyun.dysmsapi20170525.Client client = Sample.createClient("xxx", "xxx");
         com.aliyun.dysmsapi20170525.models.SendSmsRequest sendSmsRequest = new com.aliyun.dysmsapi20170525.models.SendSmsRequest()
                 .setSignName("阿里云短信测试")
                 .setTemplateCode("SMS_154950909")
-                .setPhoneNumbers("15702681331")
+                .setPhoneNumbers("xxx")
                 .setTemplateParam("{\"code\":\"1234\"}");
         com.aliyun.teautil.models.RuntimeOptions runtime = new com.aliyun.teautil.models.RuntimeOptions();
         try {

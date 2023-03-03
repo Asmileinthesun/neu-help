@@ -21,7 +21,7 @@ public class MsmserviceImpl {
 
 //    @Override
     public Boolean send() {
-        DefaultProfile profile = DefaultProfile.getProfile("default", "LTAI5tCJue2F8sz2tCNnoZyS", "6EuUqgxtPha2gEXPo2Adm4cajXqHOH");
+        DefaultProfile profile = DefaultProfile.getProfile("default", "xxx", "xxx");
         IAcsClient client = new DefaultAcsClient(profile);
 
         CommonRequest request = new CommonRequest();
@@ -31,7 +31,7 @@ public class MsmserviceImpl {
         request.setSysVersion("2017-05-25");
         request.setSysAction("SendSms");
 
-        request.putQueryParameter("PhoneNumbers","15702681331");
+        request.putQueryParameter("PhoneNumbers","xxx");
         request.putQueryParameter("SignName", "阿里云短信测试");//签名名称
         request.putQueryParameter("TemplateCode", "SMS_154950909");
         request.putQueryParameter("TemplateParam","{\"code\":\"1234\"}");
